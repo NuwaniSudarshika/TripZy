@@ -41,7 +41,7 @@ export default function HomeScreen() {
   }, []);
 
   const handleGetStarted = () => {
-    router.push('/hotels');
+    router.push('/login');
   };
 
   return (

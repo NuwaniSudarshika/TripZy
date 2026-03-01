@@ -1,98 +1,145 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  Image,
+  ImageBackground,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Animated,
+  StatusBar,
+} from 'react-native';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient'; // For overlay gradient
+
+const images = [
+  require('../../assets/images/homepage1.jpg'),
+  require('../../assets/images/homepage2.jpg'),
+  require('../../assets/images/homepage3.jpg'),
+  require('../../assets/images/homepage4.jpg'),
+  require('../../assets/images/homepage5.jpg'),
+];
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  // Change image every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }).start(() => {
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+        fadeAnim.setValue(1);
+      });
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleGetStarted = () => {
+    router.push('/hotels');
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar hidden />
+      <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+        <ImageBackground
+          source={images[currentIndex]}
+          style={styles.background}
+          resizeMode="cover"
+        >
+          {/* Gradient Overlay */}
+          <LinearGradient
+            colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.2)']}
+            style={styles.gradientOverlay}
+          >
+            <View style={styles.contentContainer}>
+              {/* Logo */}
+              <Image
+                source={require('../../assets/images/logoo.png')}
+                style={styles.logo}
+                resizeMode="cover"
+              />
+              {/* Project Title */}
+              <ThemedText type="title" style={styles.title}>
+                TripZy
+              </ThemedText>
+              {/* Description */}
+              <ThemedText type="subtitle" style={styles.description}>
+                Explore the best hotels, plan your trips, and enjoy your stay with ease.
+              </ThemedText>
+              {/* CTA Button */}
+              <TouchableOpacity style={styles.button} onPress={handleGetStarted}>
+                <ThemedText type="defaultSemiBold" style={styles.buttonText}>
+                  Get Started
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+        </ImageBackground>
+      </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: { flex: 1 },
+  background: { flex: 1, width: '100%', height: '100%' },
+  gradientOverlay: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  contentContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  logo: {
+    width: 130,
+    height: 130,
+    borderRadius: 65, // circle
+    borderWidth: 2,
+    borderColor: '#fff',
+    marginBottom: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+  },
+  title: {
+    fontSize: 42,
+    color: '#fff',
+    marginBottom: 12,
+    textAlign: 'center',
+    letterSpacing: 2,
+  },
+  description: {
+    fontSize: 20,
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 28,
+    maxWidth: 350,
+  },
+  button: {
+    backgroundColor: '#A1CEDC',
+    paddingVertical: 16,
+    paddingHorizontal: 50,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  buttonText: {
+    color: '#1D3D47',
+    fontSize: 20,
   },
 });

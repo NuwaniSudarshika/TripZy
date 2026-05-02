@@ -3,31 +3,54 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  TouchableOpacity,
-  Image,
+  StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { useRouter } from 'expo-router';
+import { HotelCard } from '@/components/HotelCard';
+import { SearchBar } from '@/components/SearchBar';
+import { CategoryFilter } from '@/components/CategoryFilter';
 
-const hotels = [
+const hotelsData = [
   {
+    id: '1',
     name: 'Hotel Sunshine',
+    location: 'Mirissa, Sri Lanka',
+    price: '$120',
+    rating: 4.8,
     image: require('../assets/images/homepage1.jpg'),
   },
   {
+    id: '2',
     name: 'Ocean View Resort',
+    location: 'Galle, Sri Lanka',
+    price: '$250',
+    rating: 4.9,
     image: require('../assets/images/homepage2.jpg'),
   },
   {
+    id: '3',
     name: 'Mountain Retreat',
+    location: 'Ella, Sri Lanka',
+    price: '$80',
+    rating: 4.5,
     image: require('../assets/images/homepage3.jpg'),
   },
   {
+    id: '4',
     name: 'City Inn',
+    location: 'Colombo, Sri Lanka',
+    price: '$60',
+    rating: 4.2,
     image: require('../assets/images/homepage4.jpg'),
   },
   {
-    name: 'Grand Palace Hotel',
+    id: '5',
+    name: 'Grand Palace',
+    location: 'Kandy, Sri Lanka',
+    price: '$180',
+    rating: 4.7,
     image: require('../assets/images/homepage5.jpg'),
   },
 ];
@@ -35,80 +58,84 @@ const hotels = [
 export default function HotelsPage() {
   const router = useRouter();
 
-  const handleSignUp = () => {
-    router.push('/signup');
+  const handlePress = (id: string) => {
+    router.push({
+      pathname: '/details/[id]',
+      params: { id }
+    } as any);
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <ThemedText type="title" style={styles.header}>
-        Available Hotels
-      </ThemedText>
-
-      {hotels.map((hotel, index) => (
-        <View key={index} style={styles.card}>
-          <Image source={hotel.image} style={styles.image} />
-
-          <View style={styles.cardContent}>
-            <ThemedText type="subtitle" style={styles.hotelName}>
-              {hotel.name}
-            </ThemedText>
-
-            <TouchableOpacity
-              style={styles.bookButton}
-              onPress={handleSignUp}
-            >
-              <ThemedText style={styles.bookText}>
-                Book Now
-              </ThemedText>
-            </TouchableOpacity>
-          </View>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" />
+      <ScrollView 
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <ThemedText type="title" style={styles.headerTitle}>
+            Discover
+          </ThemedText>
+          <ThemedText style={styles.headerSubtitle}>
+            Find your perfect stay
+          </ThemedText>
         </View>
-      ))}
-    </ScrollView>
+
+        <SearchBar />
+        <CategoryFilter />
+
+        <View style={styles.hotelsContainer}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            Top Destinations
+          </ThemedText>
+          {hotelsData.map((hotel) => (
+            <HotelCard
+              key={hotel.id}
+              name={hotel.name}
+              location={hotel.location}
+              price={hotel.price}
+              rating={hotel.rating}
+              image={hotel.image}
+              onPress={() => handlePress(hotel.id)}
+            />
+          ))}
+        </View>
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+  },
   container: {
-    padding: 20,
-    backgroundColor: '#F5F7FA',
+    flex: 1,
   },
   header: {
-    fontSize: 30,
-    marginBottom: 20,
-    textAlign: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    marginBottom: 20,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+  headerTitle: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#1D3D47',
   },
-  image: {
-    width: '100%',
-    height: 180,
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#64748B',
+    marginTop: 4,
   },
-  cardContent: {
-    padding: 15,
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1D3D47',
+    marginBottom: 16,
+    paddingHorizontal: 20,
   },
-  hotelName: {
-    fontSize: 20,
-    marginBottom: 10,
-  },
-  bookButton: {
-    backgroundColor: '#A1CEDC',
-    paddingVertical: 10,
-    borderRadius: 8,
+  hotelsContainer: {
     alignItems: 'center',
   },
-  bookText: {
-    color: '#1D3D47',
-    fontSize: 16,
-  },
-});
+});

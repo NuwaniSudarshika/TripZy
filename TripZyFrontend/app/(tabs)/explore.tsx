@@ -1,119 +1,141 @@
-import { Image, Platform, StyleSheet } from 'react-native';
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import React from 'react';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  StatusBar,
+  SafeAreaView,
+} from 'react-native';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+import { useRouter } from 'expo-router';
+import { HotelCard } from '@/components/HotelCard';
+import { SearchBar } from '@/components/SearchBar';
+import { CategoryFilter } from '@/components/CategoryFilter';
 
-export default function TabTwoScreen() {
+const hotelsData = [
+  {
+    id: '1',
+    name: 'Hotel Sunshine',
+    location: 'Mirissa, Sri Lanka',
+    price: '$120',
+    rating: 4.8,
+    image: require('../../assets/images/homepage1.jpg'),
+  },
+  {
+    id: '2',
+    name: 'Ocean View Resort',
+    location: 'Galle, Sri Lanka',
+    price: '$250',
+    rating: 4.9,
+    image: require('../../assets/images/homepage2.jpg'),
+  },
+  {
+    id: '3',
+    name: 'Mountain Retreat',
+    location: 'Ella, Sri Lanka',
+    price: '$80',
+    rating: 4.5,
+    image: require('../../assets/images/homepage3.jpg'),
+  },
+  {
+    id: '4',
+    name: 'City Inn',
+    location: 'Colombo, Sri Lanka',
+    price: '$60',
+    rating: 4.2,
+    image: require('../../assets/images/homepage4.jpg'),
+  },
+  {
+    id: '5',
+    name: 'Grand Palace',
+    location: 'Kandy, Sri Lanka',
+    price: '$180',
+    rating: 4.7,
+    image: require('../../assets/images/homepage5.jpg'),
+  },
+];
+
+export default function ExploreScreen() {
+  const router = useRouter();
+
+  const handlePress = (id: string) => {
+    router.push({
+      pathname: '/details/[id]',
+      params: { id }
+    } as any);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}
-        >
-          Explore
-        </ThemedText>
-      </ThemedView>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" />
+      <ScrollView 
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <ThemedText type="title" style={styles.headerTitle}>
+            Explore
+          </ThemedText>
+          <ThemedText style={styles.headerSubtitle}>
+            Find the best places to stay
+          </ThemedText>
+        </View>
 
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
+        <SearchBar />
+        <CategoryFilter />
 
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText> sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for different screen densities.
-        </ThemedText>
-        {/* Use your actual logo */}
-        <Image
-          source={require('../../assets/images/logoo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+        <View style={styles.hotelsContainer}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            Recommended for you
+          </ThemedText>
+          {hotelsData.map((hotel) => (
+            <HotelCard
+              key={hotel.id}
+              name={hotel.name}
+              location={hotel.location}
+              price={hotel.price}
+              rating={hotel.rating}
+              image={hotel.image}
+              onPress={() => handlePress(hotel.id)}
+            />
+          ))}
+        </View>
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
   },
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  headerTitle: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#1D3D47',
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#64748B',
+    marginTop: 4,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1D3D47',
+    marginBottom: 16,
+    paddingHorizontal: 20,
+  },
+  hotelsContainer: {
     alignItems: 'center',
-    marginRight: 8,
   },
 });

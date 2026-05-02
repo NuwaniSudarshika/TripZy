@@ -11,6 +11,7 @@ import {
 import { ThemedText } from '@/components/themed-text';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient'; // For overlay gradient
+import { Ionicons } from '@expo/vector-icons';
 
 const images = [
   require('../../assets/images/homepage1.jpg'),
@@ -41,43 +42,48 @@ export default function HomeScreen() {
   }, []);
 
   const handleGetStarted = () => {
-    router.push('/login');
+    router.push('/hotels');
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
+      <StatusBar barStyle="light-content" />
       <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
         <ImageBackground
           source={images[currentIndex]}
           style={styles.background}
           resizeMode="cover"
         >
-          {/* Gradient Overlay */}
           <LinearGradient
-            colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.2)']}
+            colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
             style={styles.gradientOverlay}
           >
             <View style={styles.contentContainer}>
-              {/* Logo */}
-              <Image
-                source={require('../../assets/images/logoo.png')}
-                style={styles.logo}
-                resizeMode="cover"
-              />
-              {/* Project Title */}
+              <View style={styles.logoContainer}>
+                <Image
+                  source={require('../../assets/images/logoo.png')}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+              </View>
+              
               <ThemedText type="title" style={styles.title}>
                 TripZy
               </ThemedText>
-              {/* Description */}
-              <ThemedText type="subtitle" style={styles.description}>
-                Explore the best hotels, plan your trips, and enjoy your stay with ease.
+              
+              <ThemedText style={styles.description}>
+                Explore luxury stays and unforgettable experiences across the world.
               </ThemedText>
-              {/* CTA Button */}
-              <TouchableOpacity style={styles.button} onPress={handleGetStarted}>
-                <ThemedText type="defaultSemiBold" style={styles.buttonText}>
-                  Get Started
+
+              <TouchableOpacity 
+                activeOpacity={0.8}
+                style={styles.button} 
+                onPress={handleGetStarted}
+              >
+                <ThemedText style={styles.buttonText}>
+                  Explore Now
                 </ThemedText>
+                <Ionicons name="arrow-forward" size={20} color="#1D3D47" />
               </TouchableOpacity>
             </View>
           </LinearGradient>
@@ -92,54 +98,56 @@ const styles = StyleSheet.create({
   background: { flex: 1, width: '100%', height: '100%' },
   gradientOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 80,
   },
   contentContainer: {
+    paddingHorizontal: 30,
+  },
+  logoContainer: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    width: 80,
+    height: 80,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 24,
+    marginBottom: 24,
+    backdropFilter: 'blur(10px)',
   },
   logo: {
-    width: 130,
-    height: 130,
-    borderRadius: 65, // circle
-    borderWidth: 2,
-    borderColor: '#fff',
-    marginBottom: 20,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
+    width: 60,
+    height: 60,
   },
   title: {
-    fontSize: 42,
+    fontSize: 56,
+    fontWeight: '900',
     color: '#fff',
     marginBottom: 12,
-    textAlign: 'center',
-    letterSpacing: 2,
+    letterSpacing: -1,
   },
   description: {
-    fontSize: 20,
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 30,
+    fontSize: 18,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: 40,
     lineHeight: 28,
-    maxWidth: 350,
   },
   button: {
     backgroundColor: '#A1CEDC',
-    paddingVertical: 16,
-    paddingHorizontal: 50,
-    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    borderRadius: 20,
+    gap: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowRadius: 20,
+    elevation: 10,
   },
   buttonText: {
     color: '#1D3D47',
-    fontSize: 20,
+    fontSize: 18,
+    fontWeight: '800',
   },
 });

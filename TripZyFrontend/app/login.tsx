@@ -1,31 +1,33 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  TextInput,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   Image,
   ImageBackground,
   StatusBar,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { ThemedText } from '@/components/themed-text';
+
+const { width, height } = Dimensions.get('window');
 
 export default function LoginPage() {
-  const navigation = useNavigation();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Simulate login validation
   const handleLogin = () => {
-    if (email === 'user@example.com' && password === '123456') {
-      // Redirect to Dashboard
-      navigation.navigate('Dashboard');
+    // Basic validation for demo
+    if (email && password) {
+      router.replace('/hotels');
     } else {
-      Alert.alert('Invalid credentials', 'Please check your email and password');
+      Alert.alert('Error', 'Please enter both email and password');
     }
   };
 
@@ -37,115 +39,172 @@ export default function LoginPage() {
         style={styles.background}
         resizeMode="cover"
       >
-        <View style={styles.overlay} />
+        <LinearGradient
+          colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.8)']}
+          style={styles.overlay}
+        >
+          <View style={styles.content}>
+            <View style={styles.logoContainer}>
+              <Image
+                source={require('../assets/images/logoo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
 
-        <View style={styles.box}>
-          <Image
-            source={require('../assets/images/logoo.png')}
-            style={styles.logo}
-          />
+            <ThemedText type="title" style={styles.title}>Welcome Back</ThemedText>
+            <ThemedText style={styles.subtitle}>Sign in to continue your journey</ThemedText>
 
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Please login to continue</Text>
+            <View style={styles.form}>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="mail-outline" size={20} color="#94A3B8" />
+                <TextInput
+                  placeholder="Email Address"
+                  placeholderTextColor="#94A3B8"
+                  style={styles.input}
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                />
+              </View>
 
-          {/* Email Input */}
-          <View style={styles.inputContainer}>
-            <Icon name="email" size={20} color="#555" style={styles.icon} />
-            <TextInput
-              placeholder="Email"
-              placeholderTextColor="#555"
-              style={styles.input}
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-            />
+              <View style={styles.inputWrapper}>
+                <Ionicons name="lock-closed-outline" size={20} color="#94A3B8" />
+                <TextInput
+                  placeholder="Password"
+                  placeholderTextColor="#94A3B8"
+                  secureTextEntry
+                  style={styles.input}
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
+
+              <TouchableOpacity style={styles.forgotPass}>
+                <ThemedText style={styles.forgotText}>Forgot Password?</ThemedText>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleLogin} activeOpacity={0.8}>
+                <LinearGradient
+                  colors={['#A1CEDC', '#4facfe']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.button}
+                >
+                  <ThemedText style={styles.buttonText}>Sign In</ThemedText>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.footer}>
+              <ThemedText style={styles.footerText}>Don't have an account? </ThemedText>
+              <TouchableOpacity onPress={() => router.push('/signup')}>
+                <ThemedText style={styles.signupText}>Sign Up</ThemedText>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          {/* Password Input */}
-          <View style={styles.inputContainer}>
-            <Icon name="lock" size={20} color="#555" style={styles.icon} />
-            <TextInput
-              placeholder="Password"
-              placeholderTextColor="#555"
-              secureTextEntry
-              style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-            />
-          </View>
-
-          {/* Login Button */}
-          <TouchableOpacity style={{ width: '100%' }} onPress={handleLogin}>
-            <LinearGradient
-              colors={['#007BFF', '#00C6FF']}
-              style={styles.button}
-              start={[0, 0]}
-              end={[1, 1]}
-            >
-              <Text style={styles.buttonText}>Login</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* Signup Redirect */}
-          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-            <Text style={styles.signup}>
-              Don't have an account? <Text style={{ fontWeight: 'bold' }}>Sign Up</Text>
-            </Text>
-          </TouchableOpacity>
-
-          <Text style={styles.forgot}>Forgot Password?</Text>
-        </View>
+        </LinearGradient>
       </ImageBackground>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-
-  background: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.4)' },
-
-  box: {
-    width: '85%',
-    backgroundColor: 'rgba(255,255,255,0.85)',
-    paddingVertical: 40,
-    paddingHorizontal: 25,
-    borderRadius: 25,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 10,
+  container: {
+    flex: 1,
   },
-
-  logo: { width: 100, height: 100, borderRadius: 50, marginBottom: 15, borderWidth: 2, borderColor: '#007BFF' },
-
-  title: { fontSize: 26, fontWeight: 'bold', color: '#333', marginBottom: 5 },
-
-  subtitle: { fontSize: 14, color: '#555', marginBottom: 20 },
-
-  inputContainer: { flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 15 },
-
-  icon: { marginRight: 10 },
-
+  background: {
+    width: width,
+    height: height,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+  },
+  content: {
+    alignItems: 'center',
+  },
+  logoContainer: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    width: 90,
+    height: 90,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  logo: {
+    width: 60,
+    height: 60,
+  },
+  title: {
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  subtitle: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 16,
+    marginBottom: 40,
+  },
+  form: {
+    width: '100%',
+    gap: 16,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
   input: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
-    padding: 14,
-    borderRadius: 12,
+    color: '#fff',
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    marginLeft: 12,
   },
-
-  button: { paddingVertical: 15, borderRadius: 12, alignItems: 'center', marginTop: 5, marginBottom: 10 },
-
-  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-
-  forgot: { color: '#007BFF', marginTop: 10, fontSize: 14 },
-
-  signup: { marginTop: 10, color: '#555', fontSize: 14 },
+  forgotPass: {
+    alignSelf: 'flex-end',
+  },
+  forgotText: {
+    color: '#A1CEDC',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  button: {
+    paddingVertical: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginTop: 10,
+    shadowColor: '#4facfe',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  buttonText: {
+    color: '#1D3D47',
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  footer: {
+    flexDirection: 'row',
+    marginTop: 40,
+  },
+  footerText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 15,
+  },
+  signupText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '800',
+    textDecorationLine: 'underline',
+  },
 });

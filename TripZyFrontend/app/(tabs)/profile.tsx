@@ -71,22 +71,66 @@ export default function ProfileScreen() {
             bookings.map((booking: any) => (
               <View key={booking._id} style={styles.bookingCard}>
                 <View style={styles.bookingHeader}>
-                  <ThemedText style={styles.hotelName}>{booking.hotelName}</ThemedText>
-                  <ThemedText style={styles.price}>${booking.totalPrice}</ThemedText>
-                </View>
-                <View style={styles.bookingDetails}>
-                  <View style={styles.detailItem}>
-                    <Ionicons name="people-outline" size={16} color="#64748B" />
-                    <ThemedText style={styles.detailText}>{booking.guests} Guests</ThemedText>
+                  <View style={{ flex: 1 }}>
+                    <ThemedText style={styles.hotelName}>{booking.hotelName}</ThemedText>
+                    <ThemedText style={styles.bookingId}>#{booking._id.slice(-8).toUpperCase()}</ThemedText>
                   </View>
-                  <View style={styles.detailItem}>
-                    <Ionicons name="calendar-outline" size={16} color="#64748B" />
-                    <ThemedText style={styles.detailText}>
-                      {new Date(booking.checkInDate).toLocaleDateString()}
-                    </ThemedText>
+                  <View style={styles.priceBox}>
+                    <ThemedText style={styles.price}>${booking.totalPrice}</ThemedText>
+                    <ThemedText style={styles.priceLabel}>Total</ThemedText>
                   </View>
                 </View>
+
+                <View style={styles.dateStrip}>
+                  <View style={styles.dateItem}>
+                    <Ionicons name="log-in-outline" size={14} color="#0284C7" />
+                    <ThemedText style={styles.dateLabel}>Check-in</ThemedText>
+                    <ThemedText style={styles.dateValue}>{new Date(booking.checkInDate).toLocaleDateString()}</ThemedText>
+                  </View>
+                  <Ionicons name="arrow-forward" size={16} color="#CBD5E1" />
+                  <View style={[styles.dateItem, { alignItems: 'flex-end' }]}>
+                    <Ionicons name="log-out-outline" size={14} color="#0284C7" />
+                    <ThemedText style={styles.dateLabel}>Check-out</ThemedText>
+                    <ThemedText style={styles.dateValue}>{booking.checkOutDate ? new Date(booking.checkOutDate).toLocaleDateString() : '—'}</ThemedText>
+                  </View>
+                </View>
+
+                <View style={styles.chipsRow}>
+                  <View style={styles.chip}>
+                    <Ionicons name="people-outline" size={13} color="#475569" />
+                    <ThemedText style={styles.chipText}>{booking.guests} Guests</ThemedText>
+                  </View>
+                  {booking.rooms && (
+                    <View style={styles.chip}>
+                      <Ionicons name="home-outline" size={13} color="#475569" />
+                      <ThemedText style={styles.chipText}>{booking.rooms} Room{booking.rooms > 1 ? 's' : ''}</ThemedText>
+                    </View>
+                  )}
+                  {booking.bedType && (
+                    <View style={styles.chip}>
+                      <Ionicons name="bed-outline" size={13} color="#475569" />
+                      <ThemedText style={styles.chipText}>{booking.bedType.charAt(0).toUpperCase() + booking.bedType.slice(1)} Bed</ThemedText>
+                    </View>
+                  )}
+                  {booking.foodService && booking.foodService !== 'none' && (
+                    <View style={styles.chip}>
+                      <Ionicons name="restaurant-outline" size={13} color="#475569" />
+                      <ThemedText style={styles.chipText}>
+                        {booking.foodService === 'breakfast' ? 'Breakfast' : booking.foodService === 'halfBoard' ? 'Half Board' : 'Full Board'}
+                      </ThemedText>
+                    </View>
+                  )}
+                </View>
+
+                {booking.specialRequests ? (
+                  <View style={styles.requestBox}>
+                    <Ionicons name="chatbubble-outline" size={13} color="#94A3B8" />
+                    <ThemedText style={styles.requestText}>{booking.specialRequests}</ThemedText>
+                  </View>
+                ) : null}
+
                 <View style={styles.statusBadge}>
+                  <Ionicons name="checkmark-circle" size={14} color="#059669" />
                   <ThemedText style={styles.statusText}>Confirmed</ThemedText>
                 </View>
               </View>
@@ -174,7 +218,7 @@ const styles = StyleSheet.create({
   },
   bookingCard: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
@@ -188,35 +232,97 @@ const styles = StyleSheet.create({
   bookingHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    alignItems: 'flex-start',
+    marginBottom: 14,
   },
   hotelName: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
     color: '#1D3D47',
-    flex: 1,
+  },
+  bookingId: {
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  priceBox: {
+    alignItems: 'flex-end',
   },
   price: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '800',
     color: '#0284C7',
   },
-  bookingDetails: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 16,
+  priceLabel: {
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '600',
   },
-  detailItem: {
+  dateStrip: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  dateItem: {
+    gap: 2,
+  },
+  dateLabel: {
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '600',
+  },
+  dateValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1D3D47',
+  },
+  chipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
   },
-  detailText: {
-    color: '#64748B',
-    fontSize: 14,
+  chipText: {
+    fontSize: 12,
+    color: '#475569',
+    fontWeight: '600',
+  },
+  requestBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 6,
+    backgroundColor: '#FFFBEB',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#FEF08A',
+  },
+  requestText: {
+    fontSize: 12,
+    color: '#92400E',
+    flex: 1,
   },
   statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     alignSelf: 'flex-start',
     backgroundColor: '#ECFDF5',
     paddingHorizontal: 12,
@@ -226,6 +332,6 @@ const styles = StyleSheet.create({
   statusText: {
     color: '#059669',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });

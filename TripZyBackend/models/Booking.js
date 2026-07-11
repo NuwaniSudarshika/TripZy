@@ -6,11 +6,16 @@ const bookingSchema = new mongoose.Schema({
   hotelName: String,
   totalPrice: Number,
   guests: Number,
+  rooms: Number,
+  bedType: String,       // 'single' | 'double' | 'king'
+  foodService: String,   // 'none' | 'breakfast' | 'halfBoard' | 'fullBoard'
   checkInDate: String,
+  checkOutDate: String,
+  specialRequests: String,
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-module.exports = mongoose.model('Booking', bookingSchema);
+module.exports = mongoose.model('Booking', bookingSchema);

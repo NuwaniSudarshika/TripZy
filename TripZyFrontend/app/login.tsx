@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,20 +14,35 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themed-text';
+import axios from 'axios';
+import { AuthContext } from '@/context/AuthContext';
 
 const { width, height } = Dimensions.get('window');
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Basic validation for demo
-    if (email && password) {
-      router.replace('/hotels');
-    } else {
+  const handleLogin = async () => {
+    if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+    
+    try {
+      const response = await axios.post('http://localhost:5000/api/users/login', {
+        email,
+        password,
+      });
+      
+      if (response.data && response.data.token) {
+        await login(response.data.user, response.data.token);
+        router.replace('/explore');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.response?.data?.msg || 'Failed to login');
     }
   };
 

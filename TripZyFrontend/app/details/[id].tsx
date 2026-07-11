@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   StyleSheet,
   View,
@@ -13,6 +13,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { AuthContext } from '@/context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
@@ -43,7 +44,23 @@ const hotelsData: any = {
 export default function HotelDetails() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { token } = useContext(AuthContext);
   const hotel = hotelsData[id as string] || hotelsData['1'];
+
+  const handleBook = () => {
+    if (!token) {
+      router.push('/login');
+    } else {
+      router.push({
+        pathname: '/booking',
+        params: {
+          hotelId: id,
+          hotelName: hotel.name,
+          price: hotel.price.replace('$', ''),
+        }
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -108,7 +125,7 @@ export default function HotelDetails() {
         </View>
         <TouchableOpacity 
           style={styles.bookButton}
-          onPress={() => router.push('/booking')}
+          onPress={handleBook}
         >
           <ThemedText style={styles.bookButtonText}>Book Now</ThemedText>
         </TouchableOpacity>

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const bookingController = require('../controllers/bookingController');
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Booking route working' });
-});
+router.post('/', bookingController.bookRoom);
+router.get('/user/:userId', bookingController.getUserBookings);
 
 module.exports = router;

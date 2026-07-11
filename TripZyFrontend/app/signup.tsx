@@ -8,11 +8,13 @@ import {
   StatusBar,
   Dimensions,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themed-text';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,6 +23,26 @@ export default function SignUpPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleRegister = async () => {
+    if (!name || !email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    try {
+      const response = await axios.post('http://localhost:5000/api/users/signup', {
+        name,
+        email,
+        password,
+      });
+      if (response.data) {
+        Alert.alert('Success', 'Account created successfully!');
+        router.push('/login');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.response?.data?.msg || 'Failed to register');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -79,7 +101,7 @@ export default function SignUpPage() {
                   />
                 </View>
 
-                <TouchableOpacity activeOpacity={0.8}>
+                <TouchableOpacity activeOpacity={0.8} onPress={handleRegister}>
                   <LinearGradient
                     colors={['#A1CEDC', '#4facfe']}
                     start={{ x: 0, y: 0 }}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,20 +8,50 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
+import { AuthContext } from '@/context/AuthContext';
+import axios from 'axios';
 
 export default function BookingScreen() {
   const router = useRouter();
+  const { hotelId, hotelName, price } = useLocalSearchParams();
+  const { user } = useContext(AuthContext);
   const [guests, setGuests] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleConfirm = () => {
-    Alert.alert(
-      'Booking Confirmed!',
-      'Your stay at TripZy has been booked successfully.',
-      [{ text: 'OK', onPress: () => router.push('/hotels') }]
-    );
+  const basePrice = Number(price || 0) * guests;
+  const serviceFee = 24;
+  const totalPrice = basePrice + serviceFee;
+
+  const handleConfirm = async () => {
+    if (!user) {
+      Alert.alert('Error', 'Please log in to book.');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      await axios.post('http://localhost:5000/api/bookings', {
+        userId: user.id,
+        hotelId: hotelId as string,
+        hotelName: hotelName as string,
+        totalPrice,
+        guests,
+        checkInDate: new Date().toISOString(),
+      });
+      
+      Alert.alert(
+        'Booking Confirmed!',
+        'Your stay at TripZy has been booked successfully.',
+        [{ text: 'OK', onPress: () => router.push('/profile') }]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Failed to complete booking. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -39,7 +69,8 @@ export default function BookingScreen() {
           <ThemedText style={styles.sectionLabel}>Full Name</ThemedText>
           <TextInput 
             style={styles.input}
-            placeholder="John Doe"
+            value={user?.name || ''}
+            editable={false}
             placeholderTextColor="#94A3B8"
           />
         </View>
@@ -48,7 +79,8 @@ export default function BookingScreen() {
           <ThemedText style={styles.sectionLabel}>Email Address</ThemedText>
           <TextInput 
             style={styles.input}
-            placeholder="john@example.com"
+            value={user?.email || ''}
+            editable={false}
             keyboardType="email-address"
             placeholderTextColor="#94A3B8"
           />
@@ -70,25 +102,25 @@ export default function BookingScreen() {
         </View>
 
         <View style={styles.summary}>
-          <ThemedText style={styles.summaryTitle}>Price Summary</ThemedText>
+          <ThemedText style={styles.summaryTitle}>Price Summary ({hotelName})</ThemedText>
           <View style={styles.summaryRow}>
-            <ThemedText style={styles.summaryLabel}>Stay (3 nights)</ThemedText>
-            <ThemedText style={styles.summaryValue}>$360</ThemedText>
+            <ThemedText style={styles.summaryLabel}>Stay ({guests} guests)</ThemedText>
+            <ThemedText style={styles.summaryValue}>${basePrice}</ThemedText>
           </View>
           <View style={styles.summaryRow}>
             <ThemedText style={styles.summaryLabel}>Service fee</ThemedText>
-            <ThemedText style={styles.summaryValue}>$24</ThemedText>
+            <ThemedText style={styles.summaryValue}>${serviceFee}</ThemedText>
           </View>
           <View style={[styles.summaryRow, styles.totalRow]}>
             <ThemedText style={styles.totalLabel}>Total</ThemedText>
-            <ThemedText style={styles.totalValue}>$384</ThemedText>
+            <ThemedText style={styles.totalValue}>${totalPrice}</ThemedText>
           </View>
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-          <ThemedText style={styles.confirmButtonText}>Confirm & Pay</ThemedText>
+        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm} disabled={isSubmitting}>
+          <ThemedText style={styles.confirmButtonText}>{isSubmitting ? 'Booking...' : 'Confirm & Pay'}</ThemedText>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
